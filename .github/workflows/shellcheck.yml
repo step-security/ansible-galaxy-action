@@ -11,4 +11,4 @@ jobs:
       - name: checkout repo
         uses: actions/checkout@v5
       - name: Run ShellCheck
-        uses: ludeeus/action-shellcheck@v2
+        uses: ludeeus/action-shellcheck@2.0.0

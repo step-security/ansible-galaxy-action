@@ -1,7 +1,7 @@
  Action Ansible Galaxy Roles Release
 ===============================
 
-This Action will import ansible roles on [galaxy-ng](https://galaxy.ansible.com). Caution, this action is only for roles, for collections maybe you want to consider using the [ansible-publish](https://github.com/marketplace/actions/ansible-publish) action.
+This Action will import ansible roles on [galaxy-ng](https://galaxy.ansible.com). Caution, this action is only for roles.
 
 ## Example usage
 Example of ``.github/workflows/galaxy.yml``

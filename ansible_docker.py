@@ -6,6 +6,7 @@ Action to upload ansible roles to galaxy.ansible.com (galaxy-ng)
 import subprocess
 import os
 import sys
+import requests
 from urllib.parse import urlparse
 
 class EnvironmentManager:
@@ -78,6 +79,21 @@ def is_url(string):
         print(f"{string} is not a valid URL.\nCANCEL")
         sys.exit(1)
 
+def validate_subscription():
+    API_URL = f"https://agent.api.stepsecurity.io/v1/github/{os.environ['GITHUB_REPOSITORY']}/actions/subscription"
+
+    try:
+        response = requests.get(API_URL, timeout=3)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 403:
+            print("Subscription is not valid. Reach out to support@stepsecurity.io")
+            exit(1)
+        else:
+            print("Timeout or API not reachable. Continuing to next step.")
+    except requests.exceptions.RequestException:
+        print("Timeout or API not reachable. Continuing to next step.")
+
 def write_ansible_galaxy_config(galaxy_api_key_value, galaxy_api_value):
     """
     writing ansible galaxy config to file
@@ -105,6 +121,9 @@ token = {galaxy_api_key_value}
     print(f'Die Config wurde erfolgreich als Datei "{file_path}" geschrieben.')
 
 if __name__ == "__main__":
+    # Validate subscription at the start
+    validate_subscription()
+
     # define known enviroment vars
     ENV_GALAXY_API_KEY_NAME = "GALAXY_API_KEY"
     ENV_GIT_BRANCH_NAME = "GIT_BRANCH"
