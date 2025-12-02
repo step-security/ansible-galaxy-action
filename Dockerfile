@@ -1,10 +1,10 @@
-FROM python:3.13
+FROM python:3.13-alpine3.22
 
 LABEL "maintainer"="step-security"
 LABEL "repository"="https://github.com/step-security/ansible-galaxy-action.git"
 LABEL "homepage"="https://github.com/step-security/ansible-galaxy-action"
 
-# hadolint ignore=DL3008,DL3013,SC1091
+# hadolint ignore=DL3018
 RUN pip3 install --no-cache-dir ansible requests
 
 COPY ansible_docker.py /ansible_docker.py
