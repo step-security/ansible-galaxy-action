@@ -1,0 +1,37 @@
+---
+name: Action Ansible Galaxy Release
+description: Action to Release Ansible Roles to galaxy.ansible.com (galaxy-ng)
+author: step-security
+
+inputs:
+  galaxy_api_key:
+    description: |
+      Your personal Galaxy-NG API key
+      You find them on Galaxy-NG -> Collections -> API-Token.
+      The Token is valid for uploading ansible roles too.
+    required: true
+  galaxy_version:
+    description: |
+      The galaxy version for galaxy-ng.
+      Provided with the --branch "$galaxy_version" option on the galaxy import tool
+      Default is the GITHUB_REF_NAME
+    required: false
+  path:
+    description: The location of your role. (relative path)
+    required: false
+    default: "./"
+  galaxy_api:
+    description: Ansible Galaxy API Endpunkt
+    required: false
+    default: "https://galaxy.ansible.com/api/"
+runs:
+  using: docker
+  image: Dockerfile
+  env:
+    GALAXY_API_KEY: ${{ inputs.galaxy_api_key }}
+    GIT_BRANCH: ${{ inputs.galaxy_version }}
+    PATH: ${{ inputs.path }}
+    GALAXY_API: ${{ inputs.galaxy_api }}
+branding:
+  icon: 'upload-cloud'
+  color: 'black'
