@@ -26,7 +26,7 @@ inputs:
     default: "https://galaxy.ansible.com/api/"
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/step-security/ansible-galaxy-action:v1.2.0@sha256:0811c837c9e2810422d736d8d1271c1bc6dd542b3ac1741ba1a8478d0ee62499' #v1.2.0
+  image: 'docker://ghcr.io/step-security/ansible-galaxy-action:v1.2.1@sha256:1fae9b3d27b44e0f3527a72d1eb4c7c455bd79745d8ad5283239851b7f437eca' #v1.2.1
   env:
     GALAXY_API_KEY: ${{ inputs.galaxy_api_key }}
     GIT_BRANCH: ${{ inputs.galaxy_version }}
