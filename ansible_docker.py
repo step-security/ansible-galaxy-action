@@ -6,6 +6,7 @@ Action to upload ansible roles to galaxy.ansible.com (galaxy-ng)
 import subprocess
 import os
 import sys
+import json
 import requests
 from urllib.parse import urlparse
 
@@ -80,17 +81,44 @@ def is_url(string):
         sys.exit(1)
 
 def validate_subscription():
-    API_URL = f"https://agent.api.stepsecurity.io/v1/github/{os.environ['GITHUB_REPOSITORY']}/actions/subscription"
+    repo_private = None
+    event_path = os.environ.get("GITHUB_EVENT_PATH")
+    if event_path and os.path.exists(event_path):
+        try:
+            with open(event_path, "r", encoding="utf-8") as f:
+                payload = json.load(f)
+            repo_private = payload.get("repository", {}).get("private")
+        except (OSError, ValueError):
+            repo_private = None
+
+    upstream = "ansible-actions/ansible-galaxy-action"
+    action_repo = os.environ.get("GITHUB_ACTION_REPOSITORY", "")
+    docs_url = "https://docs.stepsecurity.io/actions/stepsecurity-maintained-actions"
+
+    print("")
+    print("\033[1;36mStepSecurity Maintained Action\033[0m")
+    print(f"Secure drop-in replacement for {upstream}")
+    if repo_private is False:
+        print("\033[32m✓ Free for public repositories\033[0m")
+    print(f"\033[36mLearn more:\033[0m {docs_url}")
+    print("")
+
+    if repo_private is False:
+        return
+
+    server_url = os.environ.get("GITHUB_SERVER_URL", "https://github.com")
+    body = {"action": action_repo}
+    if server_url != "https://github.com":
+        body["ghes_server"] = server_url
+
+    api_url = f"https://agent.api.stepsecurity.io/v1/github/{os.environ.get('GITHUB_REPOSITORY', '')}/actions/maintained-actions-subscription"
 
     try:
-        response = requests.get(API_URL, timeout=3)
-        response.raise_for_status()
-    except requests.exceptions.HTTPError as e:
-        if e.response.status_code == 403:
-            print("Subscription is not valid. Reach out to support@stepsecurity.io")
-            exit(1)
-        else:
-            print("Timeout or API not reachable. Continuing to next step.")
+        response = requests.post(api_url, json=body, timeout=3)
+        if response.status_code == 403:
+            print(f"::error::\033[1;31mThis action requires a StepSecurity subscription for private repositories.\033[0m")
+            print(f"::error::\033[31mLearn how to enable a subscription: {docs_url}\033[0m")
+            sys.exit(1)
     except requests.exceptions.RequestException:
         print("Timeout or API not reachable. Continuing to next step.")
 
